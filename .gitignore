@@ -1,8 +1,10 @@
-bin
-lib
-include
-db
-dbd
+/bin/
+/lib
+/include
+/db
+/dbd
+/data
+/data/
 *_BAK.adl
 envPaths*
 cdCommands
@@ -19,6 +21,8 @@ O.*/
 .settings/
 
 # ffmpegServer vendor libraries
-vendor/ffmpeg*
-vendor/yasm*
-
+#vendor/ffmpeg*
+#vendor/yasm*
+/vendor/ffmpeg-linux-x86_64/
+/vendor/yasm-linux-x86_64/
+/iocs/example*
