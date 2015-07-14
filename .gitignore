@@ -5,6 +5,11 @@
 /dbd
 /data
 /data/
+/iocs/*/bin/
+/iocs/*/lib/
+/iocs/*/dbd/
+/iocs/*/db/
+/iocs/*/data/
 *_BAK.adl
 envPaths*
 cdCommands
