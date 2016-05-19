@@ -9,8 +9,8 @@ class FFmpegServer(Device):
     Dependencies = (ADCore,)
     # Device attributes
     LibFileList = ['swscale', 'avutil', 'avcodec', 'avformat', 'avdevice', 'ffmpegServer']
-    DbdFileList = ['ffmpegServer']  
-    AutoInstantiate = True    
+    DbdFileList = ['ffmpegServer']
+    AutoInstantiate = True
 
 @includesTemplates(NDPluginBaseTemplate)
 class _ffmpegStream(AutoSubstitution):
@@ -18,25 +18,25 @@ class _ffmpegStream(AutoSubstitution):
 
 class ffmpegStream(AsynPort):
     '''This plugin provides an http server that produces an mjpeg stream'''
-    Dependencies = (FFmpegServer,)    
+    Dependencies = (FFmpegServer,)
     # This tells xmlbuilder to use PORT instead of name as the row ID
-    UniqueName = "PORT"    
+    UniqueName = "PORT"
     _SpecificTemplate = _ffmpegStream
-    
-    def __init__(self, PORT, NDARRAY_PORT, QUEUE = 2, HTTP_PORT = 8080, BLOCK = 0, NDARRAY_ADDR = 0, MEMORY = 0, Enabled = 1, **args):
+
+    def __init__(self, PORT, NDARRAY_PORT, QUEUE = 2, HTTP_PORT = 8080, BLOCK = 0, NDARRAY_ADDR = 0, MEMORY = 0, ENABLED = 1, **args):
         # Init the superclass (AsynPort)
         self.__super.__init__(PORT)
         # Update the attributes of self from the commandline args
         self.__dict__.update(locals())
         # Make an instance of our template
-        makeTemplateInstance(self._SpecificTemplate, locals(), args)        
+        makeTemplateInstance(self._SpecificTemplate, locals(), args)
 
     # __init__ arguments
-    ArgInfo = _SpecificTemplate.ArgInfo + makeArgInfo(__init__,    
-        Enabled   = Simple('Plugin Enabled at startup?', int),
+    ArgInfo = _SpecificTemplate.ArgInfo + makeArgInfo(__init__,
+        ENABLED = Simple('Plugin Enabled at startup?', int),
         PORT = Simple('Port name for the NDStdArrays plugin', str),
         QUEUE = Simple('Input array queue size', int),
-        HTTP_PORT = Simple('HTTP Port number', int),      
+        HTTP_PORT = Simple('HTTP Port number', int),
         BLOCK = Simple('Blocking callbacks?', int),
         NDARRAY_PORT = Ident('Input array port', AsynPort),
         NDARRAY_ADDR = Simple('Input array port address', int),
@@ -44,11 +44,11 @@ class ffmpegStream(AsynPort):
     )
 
     def InitialiseOnce(self):
-        print "ffmpegServerConfigure(%(HTTP_PORT)d)" % self.__dict__                        
+        print "ffmpegServerConfigure(%(HTTP_PORT)d)" % self.__dict__
 
     def Initialise(self):
         print '# ffmpegStreamConfigure(portName, queueSize, blockingCallbacks, '\
-            'NDArrayPort, NDArrayAddr, maxMemory)'    
+            'NDArrayPort, NDArrayAddr, maxMemory)'
         print 'ffmpegStreamConfigure(' \
             '"%(PORT)s", %(QUEUE)d, %(BLOCK)d, "%(NDARRAY_PORT)s", ' \
             '"%(NDARRAY_ADDR)s", %(MEMORY)d)' % self.__dict__
@@ -64,7 +64,7 @@ class ffmpegFile(AsynPort):
     # This tells xmlbuilder to use PORT instead of name as the row ID
     UniqueName = "PORT"
     Dependencies = (FFmpegServer,)
-    _SpecificTemplate = _ffmpegFile        
+    _SpecificTemplate = _ffmpegFile
 
     def __init__(self, PORT, NDARRAY_PORT, QUEUE = 2, BLOCK = 0, NDARRAY_ADDR = 0, BUFFERS = 50, MEMORY = 0, **args):
         # Init the superclass (AsynPort)
@@ -86,5 +86,5 @@ class ffmpegFile(AsynPort):
     def Initialise(self):
         print '# ffmpegFileConfigure(portName,  queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory)' % self.__dict__
         print 'ffmpegFileConfigure  ("%(PORT)s", %(QUEUE)d, %(BLOCK)d, "%(NDARRAY_PORT)s", %(NDARRAY_ADDR)s, %(BUFFERS)d, %(MEMORY)d)' % self.__dict__
-    
+
 
