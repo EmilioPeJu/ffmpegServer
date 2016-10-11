@@ -1,5 +1,5 @@
 ASYN=         $(SUPPORT)/asyn/4-26
-ADCORE=       $(SUPPORT)/ADCore/2-4dls5
+ADCORE=       $(SUPPORT)/ADCore/2-4dls6
 NULLHTTPD=    $(SUPPORT)/nullhttpd/0-5-1dls6
 
 EPICS_BASE=/dls_sw/epics/R3.14.12.3/base
