@@ -25,6 +25,10 @@ O.*/
 .cproject
 .settings/
 
+# CLion Project Files
+.idea/
+cmake-build*/
+
 # ffmpegServer vendor libraries
 #vendor/ffmpeg*
 #vendor/yasm*
