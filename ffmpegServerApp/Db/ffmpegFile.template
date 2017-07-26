@@ -97,9 +97,6 @@
 # % gui, $(PORT), readback, Allocated buffers,   $(P)$(R)PoolAllocBuffers
 # % gui, $(PORT), readback, Free buffers,   $(P)$(R)PoolFreeBuffers
 
-# All tags starting with gdatag are DLS specific for GDA
-# % gdatag, template, ffmpegFile, $(PORT)_ffmpegFile, $(PORT) ffmpegFile class instance
-
 include "NDFile.template"
 include "NDPluginBase.template"
 
