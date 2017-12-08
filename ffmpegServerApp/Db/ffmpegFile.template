@@ -165,6 +165,7 @@ record(ao, "$(P)$(R)WIDTH") {
   field(OUT, "@asyn($(PORT) 0)FFMPEG_WIDTH")
   field(VAL, "640")
   field(PINI, "YES")  
+  info(autosaveFields, "VAL")
 }
 
 # # FFMPEG Width from driver
@@ -180,6 +181,7 @@ record(ao, "$(P)$(R)HEIGHT") {
   field(OUT, "@asyn($(PORT) 0)FFMPEG_HEIGHT")
   field(VAL, "480")
   field(PINI, "YES")  
+  info(autosaveFields, "VAL")
 }
 
 # # FFMPEG Height from driver
