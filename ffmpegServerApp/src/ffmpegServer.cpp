@@ -387,7 +387,7 @@ void ffmpegStream::processCallbacks(NDArray *pArray)
     NDAttribute *pAttribute = NULL;    
 
     /* Call the base class method */
-    NDPluginDriver::processCallbacks(pArray);
+    NDPluginDriver::beginProcessCallbacks(pArray);
     
     /* see if anyone's listening */
     pthread_mutex_lock(&this->mutex);    
