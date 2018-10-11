@@ -1,4 +1,4 @@
 ASYN          = $(SUPPORT)/asyn/4-34
-ADCORE        = $(WORK)/ADCore
-ADSIMDETECTOR = $(WORK)/ADSimDetector
-NULLHTTPD     = $(WORK)/nullhttpd
+ADCORE        = $(SUPPORT)/ADCore/3-3-2dls1
+ADSIMDETECTOR = $(SUPPORT)/ADSimDetector/2-8dls1
+NULLHTTPD     = $(SUPPORT)/nullhttpd/0-5-1dls7
