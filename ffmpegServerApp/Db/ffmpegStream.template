@@ -31,53 +31,69 @@
 # % gui, $(PORT), boyembed, ffmpegServerApp_opi/mjpg_embed.opi, P=$(P), R=$(R), DESC=MPEG Viewer
 
 # Info
+# % gui, $(PORT), groupHeading, Info
 # % gui, $(PORT), readback, Port name,   $(P)$(R)PortName_RBV
 # % gui, $(PORT), readback, Plugin type,   $(P)$(R)PluginType_RBV
 # Input
-# % gui, $(PORT), demand, Input,   $(P)$(R)NDArrayPort
+# % gui, $(PORT), demandString, Input,   $(P)$(R)NDArrayPort
 # % gui, $(PORT), readback, Input,   $(P)$(R)NDArrayPort_RBV
+
+# % gui, $(PORT), groupHeading, Callback
 # % gui, $(PORT), enum, Callbacks,   $(P)$(R)EnableCallbacks
-# % gui, $(PORT), readback, Callbacks,   $(P)$(R)EnableCallbacks_RBV
-# % gui, $(PORT), demand, Min Time,   $(P)$(R)MinCallbackTime
-# % gui, $(PORT), readback, Min Time,   $(P)$(R)MinCallbackTime_RBV
-# % gui, $(PORT), enum, Blocking,   $(P)$(R)BlockingCallbacks
-# % gui, $(PORT), readback, Blocking,   $(P)$(R)BlockingCallbacks_RBV
-# % gui, $(PORT), demand, Array counter,   $(P)$(R)ArrayCounter
-# % gui, $(PORT), readback, Array counter,   $(P)$(R)ArrayCounter_RBV
-# % gui, $(PORT), readback, Array rate,   $(P)$(R)ArrayRate_RBV
-# % gui, $(PORT), readback, Queue use,   $(P)$(R)QueueUse
-# % gui, $(PORT), readback, Queue size,   $(P)$(R)QueueSize
-# % gui, $(PORT), demand, Dropped,   $(P)$(R)DroppedArrays
-# % gui, $(PORT), readback, Dropped,   $(P)$(R)DroppedArrays_RBV
+# % gui, $(PORT), statusbits, Callbacks,   $(P)$(R)EnableCallbacks_RBV
+# % gui, $(PORT), demand, Min Callback Time,   $(P)$(R)MinCallbackTime
+# % gui, $(PORT), readback, Min Callback Time,   $(P)$(R)MinCallbackTime_RBV
+# % gui, $(PORT), enum, Block Callbacks,   $(P)$(R)BlockingCallbacks
+# % gui, $(PORT), statusbits, Block Callbacks,   $(P)$(R)BlockingCallbacks_RBV
+
+# % gui, $(PORT), groupHeading, Counters
+# % gui, $(PORT), demand, Array Counter,   $(P)$(R)ArrayCounter
+# % gui, $(PORT), readback, Array Counter,   $(P)$(R)ArrayCounter_RBV
+# % gui, $(PORT), readback, Array Rate (fps),   $(P)$(R)ArrayRate_RBV
+# % gui, $(PORT), readback, Queue Use,   $(P)$(R)QueueUse
+# % gui, $(PORT), readback, Queue Size,   $(P)$(R)QueueSize
+# % gui, $(PORT), demand, Dropped Arrays,   $(P)$(R)DroppedArrays
+# % gui, $(PORT), readback, Dropped Arrays,   $(P)$(R)DroppedArrays_RBV
+
+# % gui, $(PORT), groupHeading, Array Settings
 # % gui, $(PORT), readback, Num Dimensions,   $(P)$(R)NDimensions_RBV
-# % gui, $(PORT), readback, Dim 0 size,   $(P)$(R)ArraySize0_RBV
-# % gui, $(PORT), readback, Dim 1 size,   $(P)$(R)ArraySize1_RBV
-# % gui, $(PORT), readback, Dim 2 size,   $(P)$(R)ArraySize2_RBV
-# % gui, $(PORT), readback, In data type,   $(P)$(R)DataType_RBV
-# % gui, $(PORT), readback, Colour mode,   $(P)$(R)ColorMode_RBV
-# % gui, $(PORT), readback, Bayer pattern,   $(P)$(R)BayerPattern_RBV
+# % gui, $(PORT), readback, Dim 0 Size,   $(P)$(R)ArraySize0_RBV
+# % gui, $(PORT), readback, Dim 1 Size,   $(P)$(R)ArraySize1_RBV
+# % gui, $(PORT), readback, Dim 2 Size,   $(P)$(R)ArraySize2_RBV
+# % gui, $(PORT), readback, Input Data Type,   $(P)$(R)DataType_RBV
+# % gui, $(PORT), readback, Colour Mode,   $(P)$(R)ColorMode_RBV
+# % gui, $(PORT), readback, Bayer Pattern,   $(P)$(R)BayerPattern_RBV
 # % gui, $(PORT), readback, Unique id,   $(P)$(R)UniqueId_RBV
 # % gui, $(PORT), readback, Timestamp,   $(P)$(R)TimeStamp_RBV
+
 # Video
+# % gui, $(PORT), groupHeading, Video Settings
 # % gui, $(PORT), readback, Host,   $(P)$(R)HOST_RBV
 # % gui, $(PORT), readback, Host port,   $(P)$(R)HTTP_PORT_RBV
 # % gui, $(PORT), readback, Num clients,   $(P)$(R)CLIENTS_RBV
 # % gui, $(PORT), demand, JPEG Quality,   $(P)$(R)QUALITY
 # % gui, $(PORT), readback, JPEG Quality,   $(P)$(R)QUALITY_RBV
-# % gui, $(PORT), demand, Max width,   $(P)$(R)MAXW
-# % gui, $(PORT), readback, Max width,   $(P)$(R)MAXW_RBV
-# % gui, $(PORT), demand, Max height,   $(P)$(R)MAXH
-# % gui, $(PORT), readback, Max height,   $(P)$(R)MAXH_RBV
-# % gui, $(PORT), enum, Always on,   $(P)$(R)ALWAYS_ON
-# % gui, $(PORT), readback, Always on,   $(P)$(R)ALWAYS_ON_RBV
+# % gui, $(PORT), demand, Max Width,   $(P)$(R)MAXW
+# % gui, $(PORT), readback, Max Width,   $(P)$(R)MAXW_RBV
+# % gui, $(PORT), demand, Max Height,   $(P)$(R)MAXH
+# % gui, $(PORT), readback, Max Height,   $(P)$(R)MAXH_RBV
+# % gui, $(PORT), enum, Always On,   $(P)$(R)ALWAYS_ON
+# % gui, $(PORT), readback, Always On,   $(P)$(R)ALWAYS_ON_RBV
 # % gui, $(PORT), readback, Snapshot URL,   $(P)$(R)JPG_URL_RBV
 # % gui, $(PORT), readback, Streaming URL,   $(P)$(R)MJPG_URL_RBV
-# % gui, $(PORT), enum, Show grid,   $(P)$(R)GRID
+# % gui, $(PORT), enum, Show Grid,   $(P)$(R)GRID
 # % gui, $(PORT), demand, X Position,   $(P)$(R)GX
 # % gui, $(PORT), demand, Y Position,   $(P)$(R)GY
 # % gui, $(PORT), demand, Spacing,   $(P)$(R)GS
 # % gui, $(PORT), demand, Colour RGB,   $(P)$(R)GCOL
+# % gui, $(PORT), command, Fast Viewer
+# % gui, $(PORT), command, Fallback Viewer
+# % gui, $(PORT), command, Firefox (slow) 
+# % gui, $(PORT), command, Firefox (snapshot)
+
+
 # Memory
+# % gui, $(PORT), groupHeading, Memory
 # % gui, $(PORT), readback, Max memory,   $(P)$(R)PoolMaxMem
 # % gui, $(PORT), readback, Max buffers,   $(P)$(R)PoolMaxBuffers
 # % gui, $(PORT), readback, Used memory,   $(P)$(R)PoolUsedMem
