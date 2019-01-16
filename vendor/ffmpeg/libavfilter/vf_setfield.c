@@ -35,9 +35,9 @@ enum SetFieldMode {
     MODE_PROG,
 };
 
-typedef struct {
+typedef struct SetFieldContext {
     const AVClass *class;
-    enum SetFieldMode mode;
+    int mode;                   ///< SetFieldMode
 } SetFieldContext;
 
 #define OFFSET(x) offsetof(SetFieldContext, x)
@@ -84,7 +84,7 @@ static const AVFilterPad setfield_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_setfield = {
+AVFilter ff_vf_setfield = {
     .name        = "setfield",
     .description = NULL_IF_CONFIG_SMALL("Force field for the output video frame."),
     .priv_size   = sizeof(SetFieldContext),

@@ -29,11 +29,10 @@
 #include "libavutil/opt.h"
 #include "avfilter.h"
 #include "internal.h"
-#include "avfiltergraph.h"
 #include "audio.h"
 #include "video.h"
 
-typedef struct {
+typedef struct ZMQContext {
     const AVClass *class;
     void *zmq;
     void *responder;
@@ -86,7 +85,7 @@ static void av_cold uninit(AVFilterContext *ctx)
     zmq_ctx_destroy(zmq->zmq);
 }
 
-typedef struct {
+typedef struct Command {
     char *target, *command, *arg;
 } Command;
 
@@ -226,7 +225,7 @@ static const AVFilterPad zmq_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_zmq = {
+AVFilter ff_vf_zmq = {
     .name        = "zmq",
     .description = NULL_IF_CONFIG_SMALL("Receive commands through ZMQ and broker them to filters."),
     .init        = init,
@@ -261,7 +260,7 @@ static const AVFilterPad azmq_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_azmq = {
+AVFilter ff_af_azmq = {
     .name        = "azmq",
     .description = NULL_IF_CONFIG_SMALL("Receive commands through ZMQ and broker them to filters."),
     .init        = init,

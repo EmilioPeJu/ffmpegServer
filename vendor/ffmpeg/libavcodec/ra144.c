@@ -1,6 +1,6 @@
 /*
  * Real Audio 1.0 (14.4K)
- * Copyright (c) 2003 the ffmpeg project
+ * Copyright (c) 2003 The FFmpeg project
  *
  * This file is part of FFmpeg.
  *
@@ -1512,7 +1512,7 @@ static void add_wav(int16_t *dest, int n, int skip_first, int *m,
 
     v[0] = 0;
     for (i=!skip_first; i<3; i++)
-        v[i] = (ff_gain_val_tab[n][i] * m[i]) >> ff_gain_exp_tab[n];
+        v[i] = (ff_gain_val_tab[n][i] * (unsigned)m[i]) >> ff_gain_exp_tab[n];
 
     if (v[0]) {
         for (i=0; i < BLOCKSIZE; i++)
@@ -1569,11 +1569,11 @@ int ff_eval_refl(int *refl, const int16_t *coefs, AVCodecContext *avctx)
         b = 0x1000000 / b;
         for (j=0; j <= i; j++) {
 #if CONFIG_FTRAPV
-            int a = bp2[j] - ((refl[i+1] * bp2[i-j]) >> 12);
+            int a = bp2[j] - ((int)(refl[i+1] * (unsigned)bp2[i-j]) >> 12);
             if((int)(a*(unsigned)b) != a*(int64_t)b)
                 return 1;
 #endif
-            bp1[j] = ((bp2[j] - ((refl[i+1] * bp2[i-j]) >> 12)) * b) >> 12;
+            bp1[j] = (int)((bp2[j] - ((int)(refl[i+1] * (unsigned)bp2[i-j]) >> 12)) * (unsigned)b) >> 12;
         }
 
         if ((unsigned) bp1[i] + 0x1000 > 0x1fff)
@@ -1598,10 +1598,10 @@ void ff_eval_coefs(int *coefs, const int *refl)
     int i, j;
 
     for (i=0; i < LPC_ORDER; i++) {
-        b1[i] = refl[i] << 4;
+        b1[i] = refl[i] * 16;
 
         for (j=0; j < i; j++)
-            b1[j] = ((refl[i] * b2[i-j-1]) >> 12) + b2[j];
+            b1[j] = ((int)(refl[i] * (unsigned)b2[i-j-1]) >> 12) + b2[j];
 
         FFSWAP(int *, b1, b2);
     }
@@ -1681,12 +1681,9 @@ unsigned int ff_rescale_rms(unsigned int rms, unsigned int energy)
 }
 
 /** inverse root mean square */
-int ff_irms(const int16_t *data)
+int ff_irms(AudioDSPContext *adsp, const int16_t *data)
 {
-    unsigned int i, sum = 0;
-
-    for (i=0; i < BLOCKSIZE; i++)
-        sum += data[i] * data[i];
+    unsigned int sum = adsp->scalarproduct_int16(data, data, BLOCKSIZE);
 
     if (sum == 0)
         return 0; /* OOPS - division by zero */
@@ -1698,14 +1695,13 @@ void ff_subblock_synthesis(RA144Context *ractx, const int16_t *lpc_coefs,
                            int cba_idx, int cb1_idx, int cb2_idx,
                            int gval, int gain)
 {
-    int16_t buffer_a[BLOCKSIZE];
     int16_t *block;
     int m[3];
 
     if (cba_idx) {
         cba_idx += BLOCKSIZE/2 - 1;
-        ff_copy_and_dup(buffer_a, ractx->adapt_cb, cba_idx);
-        m[0] = (ff_irms(buffer_a) * gval) >> 12;
+        ff_copy_and_dup(ractx->buffer_a, ractx->adapt_cb, cba_idx);
+        m[0] = (ff_irms(&ractx->adsp, ractx->buffer_a) * (unsigned)gval) >> 12;
     } else {
         m[0] = 0;
     }
@@ -1716,7 +1712,7 @@ void ff_subblock_synthesis(RA144Context *ractx, const int16_t *lpc_coefs,
 
     block = ractx->adapt_cb + BUFFERSIZE - BLOCKSIZE;
 
-    add_wav(block, gain, cba_idx, m, cba_idx? buffer_a: NULL,
+    add_wav(block, gain, cba_idx, m, cba_idx? ractx->buffer_a: NULL,
             ff_cb1_vects[cb1_idx], ff_cb2_vects[cb2_idx]);
 
     memcpy(ractx->curr_sblock, ractx->curr_sblock + BLOCKSIZE,

@@ -29,8 +29,6 @@
 #include "avio_internal.h"
 #include "id3v2.h"
 
-#define PADDING_BYTES 10
-
 static void id3v2_put_size(AVIOContext *pb, int size)
 {
     avio_w8(pb, size >> 21 & 0x7f);
@@ -86,7 +84,7 @@ static int id3v2_put_ttag(ID3v2EncContext *id3, AVIOContext *avioc, const char *
     len = avio_close_dyn_buf(dyn_buf, &pb);
 
     avio_wb32(avioc, tag);
-    /* ID3v2.3 frame size is not synchsafe */
+    /* ID3v2.3 frame size is not sync-safe */
     if (id3->version == 3)
         avio_wb32(avioc, len);
     else
@@ -95,6 +93,59 @@ static int id3v2_put_ttag(ID3v2EncContext *id3, AVIOContext *avioc, const char *
     avio_write(avioc, pb, len);
 
     av_freep(&pb);
+    return len + ID3v2_HEADER_SIZE;
+}
+
+/**
+ * Write a priv frame with owner and data. 'key' is the owner prepended with
+ * ID3v2_PRIV_METADATA_PREFIX. 'data' is provided as a string. Any \xXX
+ * (where 'X' is a valid hex digit) will be unescaped to the byte value.
+ */
+static int id3v2_put_priv(ID3v2EncContext *id3, AVIOContext *avioc, const char *key, const char *data)
+{
+    int len;
+    uint8_t *pb;
+    AVIOContext *dyn_buf;
+
+    if (!av_strstart(key, ID3v2_PRIV_METADATA_PREFIX, &key)) {
+        return 0;
+    }
+
+    if (avio_open_dyn_buf(&dyn_buf) < 0)
+        return AVERROR(ENOMEM);
+
+    // owner + null byte.
+    avio_write(dyn_buf, key, strlen(key) + 1);
+
+    while (*data) {
+        if (av_strstart(data, "\\x", &data)) {
+            if (data[0] && data[1] && av_isxdigit(data[0]) && av_isxdigit(data[1])) {
+                char digits[] = {data[0], data[1], 0};
+                avio_w8(dyn_buf, strtol(digits, NULL, 16));
+                data += 2;
+            } else {
+                ffio_free_dyn_buf(&dyn_buf);
+                av_log(avioc, AV_LOG_ERROR, "Invalid escape '\\x%.2s' in metadata tag '"
+                       ID3v2_PRIV_METADATA_PREFIX "%s'.\n", data, key);
+                return AVERROR(EINVAL);
+            }
+        } else {
+            avio_write(dyn_buf, data++, 1);
+        }
+    }
+
+    len = avio_close_dyn_buf(dyn_buf, &pb);
+
+    avio_wb32(avioc, MKBETAG('P', 'R', 'I', 'V'));
+    if (id3->version == 3)
+        avio_wb32(avioc, len);
+    else
+        id3v2_put_size(avioc, len);
+    avio_wb16(avioc, 0);
+    avio_write(avioc, pb, len);
+
+    av_free(pb);
+
     return len + ID3v2_HEADER_SIZE;
 }
 
@@ -188,6 +239,13 @@ static int write_metadata(AVIOContext *pb, AVDictionary **metadata,
             continue;
         }
 
+        if ((ret = id3v2_put_priv(id3, pb, t->key, t->value)) > 0) {
+            id3->len += ret;
+            continue;
+        } else if (ret < 0) {
+            return ret;
+        }
+
         /* unknown tag, write as TXXX frame */
         if ((ret = id3v2_put_ttag(id3, pb, t->key, t->value, MKBETAG('T', 'X', 'X', 'X'), enc)) < 0)
             return ret;
@@ -244,6 +302,7 @@ int ff_id3v2_write_metadata(AVFormatContext *s, ID3v2EncContext *id3)
                                   ID3v2_ENCODING_UTF8;
     int i, ret;
 
+    ff_standardize_creation_time(s);
     if ((ret = write_metadata(s->pb, &s->metadata, id3, enc)) < 0)
         return ret;
 
@@ -270,7 +329,7 @@ int ff_id3v2_write_apic(AVFormatContext *s, ID3v2EncContext *id3, AVPacket *pkt)
 
     /* get the mimetype*/
     while (mime->id != AV_CODEC_ID_NONE) {
-        if (mime->id == st->codec->codec_id) {
+        if (mime->id == st->codecpar->codec_id) {
             mimetype = mime->str;
             break;
         }
@@ -285,7 +344,7 @@ int ff_id3v2_write_apic(AVFormatContext *s, ID3v2EncContext *id3, AVPacket *pkt)
     /* get the picture type */
     e = av_dict_get(st->metadata, "comment", NULL, 0);
     for (i = 0; e && i < FF_ARRAY_ELEMS(ff_id3v2_picture_types); i++) {
-        if (strstr(ff_id3v2_picture_types[i], e->value) == ff_id3v2_picture_types[i]) {
+        if (!av_strcasecmp(e->value, ff_id3v2_picture_types[i])) {
             type = i;
             break;
         }
@@ -324,15 +383,23 @@ int ff_id3v2_write_apic(AVFormatContext *s, ID3v2EncContext *id3, AVPacket *pkt)
     return 0;
 }
 
-void ff_id3v2_finish(ID3v2EncContext *id3, AVIOContext *pb)
+void ff_id3v2_finish(ID3v2EncContext *id3, AVIOContext *pb,
+                     int padding_bytes)
 {
     int64_t cur_pos;
 
-    /* adding an arbitrary amount of padding bytes at the end of the
-     * ID3 metadata fixes cover art display for some software (iTunes,
-     * Traktor, Serato, Torq) */
-    ffio_fill(pb, 0, PADDING_BYTES);
-    id3->len += PADDING_BYTES;
+    if (padding_bytes < 0)
+        padding_bytes = 10;
+
+    /* The ID3v2.3 specification states that 28 bits are used to represent the
+     * size of the whole tag.  Therefore the current size of the tag needs to be
+     * subtracted from the upper limit of 2^28-1 to clip the value correctly. */
+    /* The minimum of 10 is an arbitrary amount of padding at the end of the tag
+     * to fix cover art display with some software such as iTunes, Traktor,
+     * Serato, Torq. */
+    padding_bytes = av_clip(padding_bytes, 10, 268435455 - id3->len);
+    ffio_fill(pb, 0, padding_bytes);
+    id3->len += padding_bytes;
 
     cur_pos = avio_tell(pb);
     avio_seek(pb, id3->size_pos, SEEK_SET);
@@ -349,7 +416,7 @@ int ff_id3v2_write_simple(struct AVFormatContext *s, int id3v2_version,
     ff_id3v2_start(&id3, s->pb, id3v2_version, magic);
     if ((ret = ff_id3v2_write_metadata(s, &id3)) < 0)
         return ret;
-    ff_id3v2_finish(&id3, s->pb);
+    ff_id3v2_finish(&id3, s->pb, s->metadata_header_padding);
 
     return 0;
 }

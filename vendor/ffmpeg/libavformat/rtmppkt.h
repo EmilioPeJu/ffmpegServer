@@ -47,9 +47,9 @@ enum RTMPChannel {
 typedef enum RTMPPacketType {
     RTMP_PT_CHUNK_SIZE   =  1,  ///< chunk size change
     RTMP_PT_BYTES_READ   =  3,  ///< number of bytes read
-    RTMP_PT_PING,               ///< ping
-    RTMP_PT_SERVER_BW,          ///< server bandwidth
-    RTMP_PT_CLIENT_BW,          ///< client bandwidth
+    RTMP_PT_USER_CONTROL,       ///< user control
+    RTMP_PT_WINDOW_ACK_SIZE,    ///< window acknowledgement size
+    RTMP_PT_SET_PEER_BW,        ///< peer bandwidth
     RTMP_PT_AUDIO        =  8,  ///< audio packet
     RTMP_PT_VIDEO,              ///< video packet
     RTMP_PT_FLEX_STREAM  = 15,  ///< Flex shared stream
@@ -78,7 +78,7 @@ typedef struct RTMPPacket {
     int            channel_id; ///< RTMP channel ID (nothing to do with audio/video channels though)
     RTMPPacketType type;       ///< packet payload type
     uint32_t       timestamp;  ///< packet full timestamp
-    uint32_t       ts_delta;   ///< timestamp increment to the previous one in milliseconds (latter only for media packets)
+    uint32_t       ts_field;   ///< 24-bit timestamp or increment to the previous one, in milliseconds (latter only for media packets). Clipped to a maximum of 0xFFFFFF, indicating an extended timestamp field.
     uint32_t       extra;      ///< probably an additional channel ID used during streaming data
     uint8_t        *data;      ///< packet payload
     int            size;       ///< packet payload size
@@ -276,6 +276,23 @@ int ff_amf_read_bool(GetByteContext *gbc, int *val);
  *@return 0 on success or an AVERROR code on failure
 */
 int ff_amf_read_number(GetByteContext *gbc, double *val);
+
+/**
+ * Get AMF string value.
+ *
+ * This function behaves the same as ff_amf_read_string except that
+ * it does not expect the AMF type prepended to the actual data.
+ * Appends a trailing null byte to output string in order to
+ * ease later parsing.
+ *
+ *@param[in,out] gbc     GetByteContext initialized with AMF-formatted data
+ *@param[out]    str     read string
+ *@param[in]     strsize buffer size available to store the read string
+ *@param[out]    length  read string length
+ *@return 0 on success or an AVERROR code on failure
+*/
+int ff_amf_get_string(GetByteContext *bc, uint8_t *str,
+                      int strsize, int *length);
 
 /**
  * Read AMF string value.
