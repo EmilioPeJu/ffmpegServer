@@ -143,7 +143,7 @@ record(longout, "$(P)$(R)NumCapture")
 
 # # FFMPEG Bitrate
 record(ao, "$(P)$(R)BITRATE") {
-  field(DTYP, "asynInt32")
+  field(DTYP, "asynFloat64")
   field(OUT, "@asyn($(PORT) 0)FFMPEG_BITRATE")
   field(VAL, "10000000")
   field(PINI, "YES")  
@@ -152,7 +152,7 @@ record(ao, "$(P)$(R)BITRATE") {
 # # FFMPEG Bitrate from driver
 record(ai, "$(P)$(R)BITRATE_RBV") {
   field(SCAN, "I/O Intr")
-  field(DTYP, "asynInt32")
+  field(DTYP, "asynFloat64")
   field(INP, "@asyn($(PORT) 0)FFMPEG_BITRATE")
 }
 

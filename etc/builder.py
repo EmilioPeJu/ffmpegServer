@@ -8,9 +8,9 @@ class FFmpegServer(Device):
     '''Library dependencies for ffmpeg'''
     Dependencies = (ADCore,)
     # Device attributes
-    LibFileList = ['swscale', 'avutil', 'avcodec', 'avformat', 'avdevice', 'ffmpegServer']
-    DbdFileList = ['ffmpegServer']
-    AutoInstantiate = True
+    LibFileList = ['swresample', 'swscale', 'avutil', 'avcodec', 'avformat', 'avdevice', 'ffmpegServer']
+    DbdFileList = ['ffmpegServer']  
+    AutoInstantiate = True    
 
 @includesTemplates(NDPluginBaseTemplate)
 class _ffmpegStream(AutoSubstitution):
