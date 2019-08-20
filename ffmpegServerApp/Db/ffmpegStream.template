@@ -4,6 +4,8 @@
 # % macro, QUALITY, Jpeg Quality in percent
 # % macro, MAXW, Maximum Jpeg Width
 # % macro, MAXH, Maximum Jpeg Height
+# % macro, SETW, Set initial Jpeg Width
+# % macro, SETH, Set initial Jpeg Height
 # % gui, $(PORT), edmtab, ffmpegStream.edl, P=$(P),R=$(R)
 
 # # \file 
