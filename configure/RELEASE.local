@@ -1,3 +1,3 @@
 ASYN          = $(SUPPORT)/asyn/4-39
-ADCORE        = $(SUPPORT)/ADCore/3-9dls1
-ADSIMDETECTOR = $(SUPPORT)/ADSimDetector/2-10dls1-2
+ADCORE        = $(SUPPORT)/ADCore/3-9dls2
+ADSIMDETECTOR = $(SUPPORT)/ADSimDetector/2-10dls1-3
