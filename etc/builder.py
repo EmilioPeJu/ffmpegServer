@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from iocbuilder import Device, AutoSubstitution, Architecture, Xml
 from iocbuilder.arginfo import *
 
@@ -9,8 +11,8 @@ class FFmpegServer(Device):
     Dependencies = (ADCore,)
     # Device attributes
     LibFileList = ['swresample', 'swscale', 'avutil', 'avcodec', 'avformat', 'avdevice', 'ffmpegServer']
-    DbdFileList = ['ffmpegServer']  
-    AutoInstantiate = True    
+    DbdFileList = ['ffmpegServer']
+    AutoInstantiate = True
 
 @includesTemplates(NDPluginBaseTemplate)
 class _ffmpegStream(AutoSubstitution):
@@ -44,14 +46,14 @@ class ffmpegStream(AsynPort):
     )
 
     def InitialiseOnce(self):
-        print "ffmpegServerConfigure(%(HTTP_PORT)d)" % self.__dict__
+        print("ffmpegServerConfigure(%(HTTP_PORT)d)" % self.__dict__)
 
     def Initialise(self):
-        print '# ffmpegStreamConfigure(portName, queueSize, blockingCallbacks, '\
-            'NDArrayPort, NDArrayAddr, maxMemory)'
-        print 'ffmpegStreamConfigure(' \
+        print('# ffmpegStreamConfigure(portName, queueSize, blockingCallbacks, '\
+            'NDArrayPort, NDArrayAddr, maxMemory)')
+        print('ffmpegStreamConfigure(' \
             '"%(PORT)s", %(QUEUE)d, %(BLOCK)d, "%(NDARRAY_PORT)s", ' \
-            '"%(NDARRAY_ADDR)s", %(MEMORY)d)' % self.__dict__
+            '"%(NDARRAY_ADDR)s", %(MEMORY)d)' % self.__dict__)
 
 
 @includesTemplates(NDPluginBaseTemplate, NDFileTemplate)
@@ -84,7 +86,7 @@ class ffmpegFile(AsynPort):
         MEMORY = Simple('Max memory to allocate, should be maxw*maxh*nbuffer for driver and all attached plugins', int))
 
     def Initialise(self):
-        print '# ffmpegFileConfigure(portName,  queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory)' % self.__dict__
-        print 'ffmpegFileConfigure  ("%(PORT)s", %(QUEUE)d, %(BLOCK)d, "%(NDARRAY_PORT)s", %(NDARRAY_ADDR)s, %(BUFFERS)d, %(MEMORY)d)' % self.__dict__
+        print('# ffmpegFileConfigure(portName,  queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory)' % self.__dict__)
+        print('ffmpegFileConfigure  ("%(PORT)s", %(QUEUE)d, %(BLOCK)d, "%(NDARRAY_PORT)s", %(NDARRAY_ADDR)s, %(BUFFERS)d, %(MEMORY)d)' % self.__dict__)
 
 
